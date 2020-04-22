@@ -18,9 +18,10 @@ namespace WFA_GachaKingdomStory
             InitializeComponent();
             var gacha = new Gacha();
 
-            gacha.AddGachapon("SS","4","0.12","Rate Up");
-            gacha.AddGachapon("SS", "5", "0.02", "Rate Up");
-            gacha.OpenGachapon(3000);
+            gacha.AddGachapon("SS", 1, 70, "Rate Up");
+            gacha.AddGachapon("SSS", 3, 0.5, "Rate Up");
+            gacha.AddGachapon("S", 1, 90, "Rate Up");
+            gacha.OpenGachapon();
 
             var a = gacha.InfoGachapon();
         }
