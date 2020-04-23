@@ -26,8 +26,21 @@ namespace WFA_GachaKingdomStory
             gacha.AddGachapon(Rarity.SS, 1, 70, "Rate Up");
             gacha.AddGachapon(Rarity.SSS, 3, 0.5, "Rate Up");
             gacha.AddGachapon(Rarity.S, 1, 90, "Rate Up");
-            gacha.OpenGachapon();
 
+            gacha.AddGachaponItem(Rarity.S,1,"LUBU","HUN");
+            gacha.AddGachaponItem(Rarity.SS, 1, "WEIBU", "HUN");
+            gacha.AddGachaponItem(Rarity.S, 1, "MUBU", "HUN");
+
+            gacha.AddGachaponItem(Rarity.SSS, 1, "POIT", "WEI");
+            gacha.AddGachaponItem(Rarity.SS, 1, "ADRR", "WEI");
+            gacha.AddGachaponItem(Rarity.S, 1, "LOOIU", "WEI");
+
+            gacha.AddGachaponItem(Rarity.SS, 1, "SHUSHI", "SHU");
+            gacha.AddGachaponItem(Rarity.SSS, 1, "SHULIO", "SHU");
+            gacha.AddGachaponItem(Rarity.SSS, 1, "SHUSHU", "SHU");
+
+            gacha.OpenGachapon(true);
+            var aa = gacha.InfoGachaponResult();
             var a = gacha.InfoGachapon();
         }
     }

@@ -13,10 +13,11 @@ namespace GachaLib
         private bool Event;
         private string EventRemark;
         private double EventRate;
-        private double[] Luckys;
 
+        private List<GachaponLuckyModel> MGachaponsLucky;
         private List<GachaponModel> MGachapons;
         private List<GachaponModel> MRollResult;
+        private List<GachaponItemModel> MRollResults;
         private List<GachaponItemModel> MGachaponItems;
         #endregion
 
@@ -27,14 +28,20 @@ namespace GachaLib
             public int Start { get; set; }
             public double Rate { get; set; }
             public string GachaponType { get; set; }
-            public double[] Luckys { get; set; }
-    }
+            public List<GachaponLuckyModel> MGachaponsLuckys { get; set; }
+            public List<GachaponItemModel> MItemResult { get; set; }
+        }
         public class GachaponItemModel
         {
             public string Name { get; set; }
             public Rarity Rank { get; set; }
             public string Remark { get; set; }
             public int Start { get; set; }
+        }
+        public class GachaponLuckyModel
+        {
+            public double Lucky { get; set; }
+            public Rarity Rank { get; set; }
         }
         #endregion
 
@@ -43,7 +50,9 @@ namespace GachaLib
         {
             MGachapons = new List<GachaponModel>();
             MRollResult = new List<GachaponModel>();
+            MRollResults = new List<GachaponItemModel>();
             MGachaponItems = new List<GachaponItemModel>();
+            MGachaponsLucky = new List<GachaponLuckyModel>();
         }
         #endregion
 
@@ -81,91 +90,73 @@ namespace GachaLib
             }
             else
             {
-                Rolls(weight, 9);
+                Rolls(weight, 10);
             }
+
+
         }
         private void Rolls(double _weight, int _count)
         {
             Random rnd = new Random();
-            int rndLucky;
-
+            double rndLucky;
+            
             //find sss ss s <=============
-            for (int i = 0; i <= _count; i++)
+            for (int i = 1; i <= _count; i++)
             {
                 rndLucky = rnd.Next(0, _weight.AsInt());
-                switch (MGachapons[i].Rank)
+              
+                foreach(var result in MRollResult)
                 {
-                    case Rarity.SSS:
-                        if (rndLucky < MGachapons[i].Luckys.Count())
-                        {
-                            WhereEvent();
-                        }
-                        
+                    if (result.MGachaponsLuckys.Where(w => w.Lucky == rndLucky).Count() > 0) 
+                    {
+                        MRollResults.Add(WhereItem(result));
                         break;
-                    case Rarity.SS:
-                        if (rndLucky < MGachapons[i].Rate)
-                        {
-                            WhereEvent();
-                        }
-
-                        break;
-                    default:return;
+                    }
                 }
             }
 
             //continue
+            
         }
-        private void WhereEvent()
+        private GachaponItemModel WhereItem(GachaponModel _result)
         {
-           
+            //find item in MGachaponItems
+            var item = new GachaponItemModel();
+            if (!Event)
+            {
+                 item = (from items in MGachaponItems where items.Rank == _result.Rank select items).PickRandom();
+            }
+            else
+            {
+                //evemt
+            }
+            return item;
         }
         private double AddGachaponLucky()
         {
             double weight = SummaryRates((from _rate in MGachapons select new GachaponModel { Rate = _rate.Rate }).ToList());
-            bool first = true;
-            Luckys = new double[weight.AsInt()];
 
             CalculatorRate();
             foreach (var result in MRollResult)
             {
-                result.Luckys = new double[result.Rate.AsInt()];
-                MRollResult.MergeObject(CalculatorLucky(result, weight, first));
-                first = false;
+                MRollResult.MergeObject(CalculatorLucky(result));
             }
             
             return weight;
         }
-        private GachaponModel CalculatorLucky(GachaponModel _result, double _weight, bool _first)
+        private GachaponModel CalculatorLucky(GachaponModel _result)
         {
-            _result.Luckys = new double[_result.Rate.AsInt()];
-
-            int i = (from l in Luckys where l != 0 select l).Count();
+            int i = MGachaponsLucky.Count();
             int next = _result.Rate.AsInt() + i;
 
             for(int round =0;round < _result.Rate; round++)
             {
-                if (_first)
-                {
-                    Luckys[i] = Luckys.Max().AsInt();
-                    _result.Luckys[round] = Luckys[i];
-                    _first = false;
-                    i++;
-                    continue;
-                }
-
-                if(Luckys.Max() > 0 && round == 0)
-                {
-                    Luckys[i] = Luckys.Max().AsInt() + 1;
-                    _result.Luckys[round] = Luckys.Max().AsInt();
-                    i+=2;
-                    continue;
-                }
-
-                Luckys[i] = Luckys.Max().AsInt() + 1;
-                _result.Luckys[round] = Luckys[i];
+                MGachaponsLucky.Add(new GachaponLuckyModel { Lucky = i, Rank = _result.Rank });
                 i++;
             }
 
+            _result.MGachaponsLuckys = MGachaponsLucky.Where(m => m.Rank == _result.Rank)
+                .Select(m => new GachaponLuckyModel { Lucky = m.Lucky, Rank = m.Rank }).ToList();
             return _result;        
         }
         private void CalculatorRate()
@@ -211,6 +202,10 @@ namespace GachaLib
         public List<GachaponItemModel> InfoGachaponItem()
         {
             return MGachaponItems;
+        }
+        public List<GachaponItemModel> InfoGachaponResult()
+        {
+            return MRollResults;
         }
 
         //get remark
