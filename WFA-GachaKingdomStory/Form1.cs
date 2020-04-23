@@ -23,8 +23,8 @@ namespace WFA_GachaKingdomStory
 
             var gacha = new Gacha();
 
-            gacha.AddGachapon(Rarity.SS, 1, 70, "Rate Up");
-            gacha.AddGachapon(Rarity.SSS, 3, 0.5, "Rate Up");
+            gacha.AddGachapon(Rarity.SS, 3, 9.5, "Rate Up");
+            gacha.AddGachapon(Rarity.SSS,5, 0.005, "Rate Up");
             gacha.AddGachapon(Rarity.S, 1, 90, "Rate Up");
 
             gacha.AddGachaponItem(Rarity.S,1,"LUBU","HUN");
@@ -39,9 +39,14 @@ namespace WFA_GachaKingdomStory
             gacha.AddGachaponItem(Rarity.SSS, 1, "SHULIO", "SHU");
             gacha.AddGachaponItem(Rarity.SSS, 1, "SHUSHU", "SHU");
 
+            //gacha.OpenGachapon(true);
+            //var aa = gacha.InfoGachaponResult();
+
+
+            //event X2.5
+            gacha.EventGachapon(2.5,true,"HUN");
             gacha.OpenGachapon(true);
-            var aa = gacha.InfoGachaponResult();
-            var a = gacha.InfoGachapon();
+            var aaa = gacha.InfoGachaponResult();
         }
     }
 }

@@ -81,9 +81,10 @@ namespace GachaLib
         }
         public void OpenGachapon(bool rolls = false)
         {
+            ClearResult();
             double weight = AddGachaponLucky();
             Random rnd = new Random();
-
+                        
             if (!rolls)
             {
                 Rolls(weight, 1);
@@ -92,15 +93,39 @@ namespace GachaLib
             {
                 Rolls(weight, 10);
             }
-
-
         }
+        public void EventGachapon(double _eventRate, bool _event = true, string _eventRemark = "")
+        {
+            EventRate = _eventRate * 100;
+            Event = _event;
+
+            if (_eventRemark == "") return;
+
+            int isEvent = MGachaponItems.Select(t => t.Remark == _eventRemark).Count();
+            if (isEvent > 0)
+            {
+                Event = _event;
+                EventRemark = _eventRemark;
+            }
+        }
+        public List<GachaponModel> InfoGachapon()
+        {
+            return MGachapons;
+        }
+        public List<GachaponItemModel> InfoGachaponItem()
+        {
+            return MGachaponItems;
+        }
+        public List<GachaponItemModel> InfoGachaponResult()
+        {
+            return MRollResults;
+        }
+
         private void Rolls(double _weight, int _count)
         {
             Random rnd = new Random();
             double rndLucky;
             
-            //find sss ss s <=============
             for (int i = 1; i <= _count; i++)
             {
                 rndLucky = rnd.Next(0, _weight.AsInt());
@@ -114,13 +139,42 @@ namespace GachaLib
                     }
                 }
             }
-
-            //continue
-            
+        }
+        private void ClearResult()
+        {
+            MRollResults.RemoveAll(x => x.Rank == x.Rank);
+            MGachaponsLucky.RemoveAll(x => x.Rank == x.Rank);
+            MRollResult.RemoveAll(x => x.Rank == x.Rank);
+        }
+        private void CalculatorRate()
+        {
+            if (!Event)
+            {
+                foreach (var cal in MGachapons)
+                {
+                    MRollResult.Add(new GachaponModel
+                    {
+                        Rate = cal.Rate * 100,
+                        Start = cal.Start,
+                        Rank = cal.Rank
+                    });
+                }
+            }
+            else
+            {
+                foreach (var cal in MGachapons)
+                {
+                    MRollResult.Add(new GachaponModel
+                    {
+                        Rate = (cal.Rate * 100) + (cal.Rate * (EventRate / 100)),
+                        Start = cal.Start,
+                        Rank = cal.Rank
+                    });
+                }
+            }
         }
         private GachaponItemModel WhereItem(GachaponModel _result)
         {
-            //find item in MGachaponItems
             var item = new GachaponItemModel();
             if (!Event)
             {
@@ -128,8 +182,21 @@ namespace GachaLib
             }
             else
             {
-                //evemt
+                item = WhereEvent(_result);
             }
+            return item;
+        }
+        private GachaponItemModel WhereEvent(GachaponModel _result)
+        {
+            var item = new GachaponItemModel();
+
+            if (Event)
+            {
+                item = (from items in MGachaponItems
+                        where items.Rank == _result.Rank && items.Remark == EventRemark
+                        select items).PickRandom();
+            }
+
             return item;
         }
         private double AddGachaponLucky()
@@ -159,32 +226,6 @@ namespace GachaLib
                 .Select(m => new GachaponLuckyModel { Lucky = m.Lucky, Rank = m.Rank }).ToList();
             return _result;        
         }
-        private void CalculatorRate()
-        {
-            foreach (var cal in MGachapons)
-            {
-                MRollResult.Add(new GachaponModel
-                {
-                    Rate = cal.Rate * 100,
-                    Start = cal.Start,
-                    Rank = cal.Rank
-                });
-            }           
-        }
-        public void EventGachapon(double _eventRate, string _eventRemark = "", bool _event = true)
-        {
-            EventRate = _eventRate * 100;
-            Event = _event;
-
-            if (_eventRemark == "") return;
-
-            int isEvent = MGachaponItems.Select(t => t.Remark == _eventRemark).Count();
-            if (isEvent > 0)
-            {
-                Event = _event;
-                EventRemark = _eventRemark;
-            }            
-        }
         private double SummaryRates(List<GachaponModel> _rates)
         {
             double sum = 0;
@@ -194,25 +235,6 @@ namespace GachaLib
             }
 
             return Event ? sum += EventRate : sum;
-        }
-        public List<GachaponModel> InfoGachapon()
-        {
-            return MGachapons;
-        }
-        public List<GachaponItemModel> InfoGachaponItem()
-        {
-            return MGachaponItems;
-        }
-        public List<GachaponItemModel> InfoGachaponResult()
-        {
-            return MRollResults;
-        }
-
-        //get remark
-        //set remark
-        private void AddRate(List<GachaponModel> _rates)
-        {
-           
         }
         #endregion
 

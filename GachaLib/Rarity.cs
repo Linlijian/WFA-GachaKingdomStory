@@ -8,7 +8,10 @@ namespace GachaLib
 {
     public enum Rarity
     {
-        //hight
+        //event
+        EVENT,
+
+        //high
         SSS,
         SSR,
         UR,
