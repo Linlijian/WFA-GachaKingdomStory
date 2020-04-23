@@ -16,11 +16,16 @@ namespace WFA_GachaKingdomStory
         public Form1()
         {
             InitializeComponent();
+
+            Random rnd = new Random();
+            int rndLucky = rnd.Next(1, 100);
+
+
             var gacha = new Gacha();
 
-            gacha.AddGachapon("SS", 1, 70, "Rate Up");
-            gacha.AddGachapon("SSS", 3, 0.5, "Rate Up");
-            gacha.AddGachapon("S", 1, 90, "Rate Up");
+            gacha.AddGachapon(Rarity.SS, 1, 70, "Rate Up");
+            gacha.AddGachapon(Rarity.SSS, 3, 0.5, "Rate Up");
+            gacha.AddGachapon(Rarity.S, 1, 90, "Rate Up");
             gacha.OpenGachapon();
 
             var a = gacha.InfoGachapon();
